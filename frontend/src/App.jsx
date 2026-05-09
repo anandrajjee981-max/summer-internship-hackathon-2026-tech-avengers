@@ -1,10 +1,12 @@
 import React from 'react'
+import Userlogin from './pages/Userlogin'
 
 const App = () => {
   return (
-    <div>
-      
-    </div>
+<main className='bg-black'>
+<Userlogin/>
+
+</main>
   )
 }
 
