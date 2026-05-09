@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Userlogin = () => {
   const [display, setDisplay] = useState("");
@@ -171,6 +173,13 @@ const Userlogin = () => {
           </button>
 
         </form>
+
+<Link 
+  to="/register" 
+  className='text-emerald-300 hover:text-white text-sm mt-6 transition-colors duration-200 block text-center'
+>
+  Create new account
+</Link>
       </div>
     </div>
   );
