@@ -18,8 +18,10 @@ app.get("/", (req,res)=>{
 })
 
 const userroutes = require('../src/routes/user.routes')
+const gymroutes = require('../src/routes/gym.routes')
 
 app.use("/api/auth",userroutes)
+app.use("/api/auths",gymroutes)
 
 module.exports = app
 
