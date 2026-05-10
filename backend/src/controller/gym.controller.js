@@ -11,13 +11,13 @@ if(ifemail){
     })
 }
 const hash = await bcrypt.hash(password,10)
-const hash1 = await bcrypt.hash(gymcode,10)
+
 const gym = await gymmodel.create({
     gymname,
     email,
     password: hash,
     phonenumber ,
-    gymcode : hash1
+    gymcode 
 })
 const token = jwt.sign({
     id: gym._id
@@ -31,7 +31,8 @@ res.status(201).json({
     gym :{
         email : gym.email ,
         gymname : gym.gymname ,
-        phonenumber : gym.phonenumber 
+        phonenumber : gym.phonenumber ,
+        gymcode : gym.gymcode
     }
 })
 
@@ -60,16 +61,7 @@ async function logincontroller(req, res) {
             message: "invalid password"
         })
     }
-       const isgymcodevalid = await bcrypt.compare(
-        gymcode,
-        gym.gymcode
-    )
-
-    if (!isgymcodevalid) {
-        return res.status(401).json({
-            message: "invalid gym code"
-        })
-    }
+      
 
     const token = jwt.sign(
         {

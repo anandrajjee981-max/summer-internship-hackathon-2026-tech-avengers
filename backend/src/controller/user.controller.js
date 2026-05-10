@@ -1,9 +1,9 @@
 const usermodel = require('../model/usermodel')
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
-
+const gymmodel = require('../model/gymmodel')
 async function registercontroller(req,res){
-const {username , email , password , phonenumber} = req.body
+const {username , email , password , phonenumber,gymcode} = req.body
 const ifemail = await usermodel.findOne({
     $or:[
         {username},
@@ -15,12 +15,21 @@ if(ifemail){
         message : ifemail.email === email ? "user with this email already exist" : "user with this username already exist"
     })
 }
+const code = await gymmodel.findOne({ gymcode })
+
+if (!code) {
+    return res.status(404).json({
+        message: "enter correct gym code"
+    })
+}
+
 const hash = await bcrypt.hash(password,10)
 const user = await usermodel.create({
     username,
     email,
     password: hash,
-    phonenumber
+    phonenumber,
+    gymcode
 })
 const token = jwt.sign({
     id: user._id
@@ -34,7 +43,8 @@ res.status(201).json({
     user :{
         email : user.email ,
         username : user.username ,
-        phonenumber : user.phonenumber 
+        phonenumber : user.phonenumber ,
+        gymcode : user.gymcode
     }
 })
 

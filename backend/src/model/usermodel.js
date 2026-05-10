@@ -15,6 +15,10 @@ type : String ,
 required : true
 
 },
+gymcode :{
+    type : String ,
+    required : true
+},
 phonenumber : Number 
 
 })
