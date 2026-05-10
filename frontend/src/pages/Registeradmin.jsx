@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axios from 'axios'; // Import added
 import { Link } from 'react-router-dom';
 
-const Register = () => {
+const Registeradmin = () => {
   const [display, setDisplay] = useState("");
-  const [error, setError] = useState("");
+  const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch initial data on mount (Only if needed for server-spin up)
+  // Fetch initial data on mount (Server spin-up check)
   useEffect(() => {
     axios.get("https://summer-internship-hackathon-2026-tech.onrender.com")
       .then((res) => {
@@ -18,32 +18,34 @@ const Register = () => {
       });
   }, []);
 
-  function submitHandle(e) {
+  function registeradmin(e) {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
     setDisplay("");
+    setIsError(false);
 
-    // Added gymcode to form elements destructuring
-    const { username, password, email, phonenumber, gymcode } = e.target.elements;
+    // Form inputs value extraction
+    const { gymname, gymcode, email, password } = e.target.elements;
 
     axios.post(
-      'https://summer-internship-hackathon-2026-tech.onrender.com/api/auth/register',
+      'https://summer-internship-hackathon-2026-tech.onrender.com/api/auths/colab',
       {
-        username: username.value,
-        password: password.value,
+        gymname: gymname.value,
+        gymcode: gymcode.value,
         email: email.value,
-        phonenumber: phonenumber.value,
-        gymcode: gymcode.value // Sent to the backend
+        password: password.value
       }
     )
-    .then(() => {
-      setDisplay("Registered successfully! Welcome aboard.");
+    .then((res) => {
+      console.log(res.data);
+      setIsError(false);
+      setDisplay("Admin registered successfully!");
       e.target.reset(); // Clear form fields
     })
     .catch((err) => {
       console.error(err);
-      setError(err.response?.data?.message || "Registration failed. Please try again.");
+      setIsError(true);
+      setDisplay(err.response?.data?.message || "Something went wrong during registration.");
     })
     .finally(() => {
       setIsLoading(false);
@@ -51,79 +53,44 @@ const Register = () => {
   }
 
   return (
-    // Updated background height & deep green dark colors (Matches Login Page)
+    // Matching Premium Dark Green Theme
     <div className="w-full min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0a1f11] via-[#102b18] to-[#16361e] p-4 py-10 font-sans">
       
-      {/* Main Registration Card */}
+      {/* Registration Card */}
       <div className="w-full max-w-md bg-black/30 backdrop-blur-xl rounded-2xl p-8 border border-white/25 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)]">
         
         {/* Header */}
         <div className="text-center mb-8">
-          <h2 className="text-4xl font-extrabold text-white tracking-tight">Create Account</h2>
-          <p className="text-emerald-200 text-base mt-2 font-medium">Join the Summer Internship Hackathon 2026</p>
+          <h2 className="text-4xl font-extrabold text-white tracking-tight">Register Admin</h2>
+          <p className="text-emerald-200 text-base mt-2 font-medium">Create collaborator gym account</p>
         </div>
 
         {/* Status Messages */}
         {display && (
-          <div className="mb-6 p-4 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-100 text-sm font-semibold text-center">
-            🎉 {display}
-          </div>
-        )}
-        {error && (
-          <div className="mb-6 p-4 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-100 text-sm font-semibold text-center">
-            ⚠️ {error}
+          <div className={`mb-6 p-4 rounded-xl text-sm font-semibold border transition-all duration-300 text-center ${
+            isError
+              ? "bg-rose-950/80 border-rose-500/50 text-rose-100"
+              : "bg-emerald-950/80 border-emerald-500/50 text-emerald-100"
+          }`}>
+            {isError ? '⚠️ ' : '🎉 '}{display}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={submitHandle} className="space-y-5">
+        <form onSubmit={registeradmin} className="space-y-5">
           
-          {/* Username Input */}
+          {/* Gym Name Input */}
           <div>
-            <label className="block text-sm font-bold text-white uppercase tracking-wider mb-2">Full Name</label>
+            <label className="block text-sm font-bold text-white uppercase tracking-wider mb-2">Gym Name</label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-100">
-                👤
+                🏋️‍♂️
               </span>
               <input 
                 type="text" 
-                name="username" 
+                name="gymname" 
                 required
-                placeholder="Enter your name"
-                className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/20 rounded-xl text-white placeholder-emerald-300/70 text-base focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
-              />
-            </div>
-          </div>
-
-          {/* Email Input */}
-          <div>
-            <label className="block text-sm font-bold text-white uppercase tracking-wider mb-2">Email Address</label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-100">
-                📧
-              </span>
-              <input 
-                type="email" 
-                name="email" 
-                required
-                placeholder="Enter your email"
-                className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/20 rounded-xl text-white placeholder-emerald-300/70 text-base focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
-              />
-            </div>
-          </div>
-
-          {/* Phone Number Input */}
-          <div>
-            <label className="block text-sm font-bold text-white uppercase tracking-wider mb-2">Phone Number</label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-100">
-                📞
-              </span>
-              <input 
-                type="tel" 
-                name="phonenumber" 
-                required
-                placeholder="Enter your phone number"
+                placeholder="Enter your gym name"
                 className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/20 rounded-xl text-white placeholder-emerald-300/70 text-base focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
               />
             </div>
@@ -140,7 +107,24 @@ const Register = () => {
                 type="text" 
                 name="gymcode" 
                 required
-                placeholder="Enter a gym code"
+                placeholder="Create unique gym code"
+                className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/20 rounded-xl text-white placeholder-emerald-300/70 text-base focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
+              />
+            </div>
+          </div>
+
+          {/* Email Input */}
+          <div>
+            <label className="block text-sm font-bold text-white uppercase tracking-wider mb-2">Email Address</label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-100">
+                📧
+              </span>
+              <input 
+                type="email" 
+                name="email" 
+                required
+                placeholder="Enter admin email"
                 className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/20 rounded-xl text-white placeholder-emerald-300/70 text-base focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
               />
             </div>
@@ -157,7 +141,7 @@ const Register = () => {
                 type="password" 
                 name="password" 
                 required
-                placeholder="Create your password"
+                placeholder="Create password"
                 className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/20 rounded-xl text-white placeholder-emerald-300/70 text-base focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
               />
             </div>
@@ -175,17 +159,17 @@ const Register = () => {
                 Registering...
               </span>
             ) : (
-              "Submit Registration"
+              "Register Gym"
             )}
           </button>
         </form>
 
-        {/* Link back to login */}
+        {/* Link back to admin login */}
         <Link 
-          to="/login" 
+          to="/adminlogin" 
           className='text-emerald-100 hover:text-white text-base font-semibold mt-6 transition-colors duration-200 block text-center'
         >
-          Already have an account? Log In
+          Already have an admin account? Log In
         </Link>
 
       </div>
@@ -193,4 +177,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Registeradmin;

@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Navigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // Capitalized 'Link' is correctly imported
 
 const Userlogin = () => {
   const [display, setDisplay] = useState("");
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [activePanel, setActivePanel] = useState("user");
 
   function fetchData() {
     axios.get("https://summer-internship-hackathon-2026-tech.onrender.com")
       .then((res) => {
-        console.log(res.data);
+        console.log("Server status:", res.status);
       })
       .catch((err) => {
-        console.log(err);
+        console.error("Server connection error:", err);
       });
   }
 
@@ -29,13 +27,14 @@ const Userlogin = () => {
     setIsLoading(true);
     setDisplay("");
 
-    const { username, password } = e.target.elements;
+    const { username, password, gymcode } = e.target.elements;
 
     axios.post(
       'https://summer-internship-hackathon-2026-tech.onrender.com/api/auth/login',
       {
         username: username.value,
-        password: password.value
+        password: password.value,
+        gymcode: gymcode.value
       },
       {
         withCredentials: true
@@ -43,61 +42,73 @@ const Userlogin = () => {
     )
       .then((res) => {
         console.log(res.data);
-        fetchData();
         setIsError(false);
         setDisplay("Login successful! Welcome back.");
         setIsLoading(false);
         e.target.reset();
       })
       .catch((err) => {
-        console.log(err.response);
-        console.log(err.response?.data);
-        console.log(err.response?.status);
+        console.log("Error object:", err.response);
         setIsError(true);
-        setDisplay(err.response?.data?.message || "Something went wrong");
+
+        const backendMessage = err.response?.data?.message || err.response?.data?.error;
+
+        if (backendMessage) {
+          setDisplay(backendMessage);
+        } else if (err.response?.status === 401) {
+          // FIX: Changed from duplicate 404 to correct 401 Unauthorized status code
+          setDisplay("Incorrect password or username. Please try again.");
+        } else if (err.response?.status === 404) {
+          setDisplay("Invalid gym code. Please check and try again.");
+        } else {
+          setDisplay("Something went wrong. Please try again later.");
+        }
+
         setIsLoading(false);
       });
   }
 
   return (
-    <div className="bg-gradient-to-br from-[#1b3b22] via-[#2d5a36] to-[#407c4d] w-full h-screen flex flex-col items-center justify-center font-sans px-4">
+    <div className="bg-gradient-to-br from-[#0a1f11] via-[#102b18] to-[#16361e] w-full min-h-screen flex flex-col items-center justify-center font-sans px-4 py-10">
       
-      {/* Top Navigation Tabs */}
-      <div className="flex bg-black/20 p-1.5 rounded-xl gap-1 mb-8 backdrop-blur-md border border-white/10 max-w-md w-full">
-        {["user", "admin", "super admin"].map((role) => (
-          <button
-            key={role}
-            onClick={() => setActivePanel(role)}
-            className={`flex-1 py-2 px-3 text-sm font-medium rounded-lg transition-all duration-300 capitalize ${
-              activePanel === role
-                ? "bg-[#519c61] text-white shadow-lg shadow-[#519c61]/30"
-                : "text-emerald-100/70 hover:text-white hover:bg-white/5"
-            }`}
-          >
-            {role} panel
+      {/* Top Navigation Tabs - FIX: Capitalized Link elements and styled buttons */}
+      <div className="flex bg-black/40 p-1.5 rounded-xl gap-2 mb-6 backdrop-blur-md border border-white/20 max-w-md w-full">
+        <Link to='/login' className="flex-1">
+          <button className="w-full py-2 px-3 text-sm font-semibold rounded-lg transition-all duration-300 capitalize bg-[#519c61] text-white shadow-lg shadow-[#519c61]/40">
+            User Panel
           </button>
-        ))}
+        </Link>
+        <Link to='/adminlogin' className="flex-1">
+          <button className="w-full py-2 px-3 text-sm font-semibold rounded-lg transition-all duration-300 capitalize text-emerald-100 hover:text-white hover:bg-white/10">
+            Admin Panel
+          </button>
+        </Link>
+        <Link to='/superlogin' className="flex-1">
+          <button className="w-full py-2 px-3 text-sm font-semibold rounded-lg transition-all duration-300 capitalize text-emerald-100 hover:text-white hover:bg-white/10">
+            Super Admin
+          </button>
+        </Link>
       </div>
 
       {/* Main Login Card */}
-      <div className="w-full max-w-md bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/20 shadow-2xl">
+      <div className="w-full max-w-md bg-black/30 backdrop-blur-xl rounded-2xl p-8 border border-white/25 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7)]">
         
         {/* Header */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-extrabold text-white tracking-tight">
+        <div className="text-center mb-6">
+          <h2 className="text-4xl font-extrabold text-white tracking-tight">
             Welcome Back
           </h2>
-          <p className="text-emerald-200/70 text-sm mt-2">
+          <p className="text-emerald-200 text-base mt-2 font-medium">
             Please enter your credentials to login
           </p>
         </div>
 
-        {/* Notification */}
+        {/* Notification Banner */}
         {display && (
-          <div className={`mb-6 p-4 rounded-xl text-sm font-medium border transition-all duration-300 ${
+          <div className={`mb-6 p-4 rounded-xl text-sm font-semibold border transition-all duration-300 ${
             isError
-              ? "bg-red-500/10 border-red-500/30 text-red-200"
-              : "bg-emerald-500/10 border-emerald-500/30 text-emerald-200"
+              ? "bg-red-950/80 border-red-500/50 text-red-100"
+              : "bg-emerald-950/80 border-emerald-500/50 text-emerald-100"
           }`}>
             <div className="flex items-center gap-2">
               <span className="text-lg">
@@ -109,15 +120,15 @@ const Userlogin = () => {
         )}
 
         {/* Form */}
-        <form onSubmit={submitHandle} className="space-y-6">
+        <form onSubmit={submitHandle} className="space-y-5">
           
           {/* Username */}
           <div>
-            <label className="block text-xs font-semibold text-emerald-100 uppercase tracking-wider mb-2">
+            <label className="block text-sm font-bold text-white uppercase tracking-wider mb-2">
               Username
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-300/60">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-100">
                 👤
               </span>
               <input
@@ -125,18 +136,37 @@ const Userlogin = () => {
                 name="username"
                 required
                 placeholder="Enter your username"
-                className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/15 rounded-xl text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
+                className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/20 rounded-xl text-white placeholder-emerald-300/70 text-base focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
+              />
+            </div>
+          </div>
+
+          {/* Gym Code */}
+          <div>
+            <label className="block text-sm font-bold text-white uppercase tracking-wider mb-2">
+              Gym Code
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-100">
+                🏢
+              </span>
+              <input 
+                type='text' 
+                name='gymcode' 
+                required
+                placeholder='Enter your gym code'
+                className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/20 rounded-xl text-white placeholder-emerald-300/70 text-base focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
               />
             </div>
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-semibold text-emerald-100 uppercase tracking-wider mb-2">
+            <label className="block text-sm font-bold text-white uppercase tracking-wider mb-2">
               Password
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-300/60">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-100">
                 🔒
               </span>
               <input
@@ -144,12 +174,12 @@ const Userlogin = () => {
                 name="password"
                 required
                 placeholder="••••••••"
-                className="w-full pl-10 pr-10 py-3 bg-white/5 border border-white/15 rounded-xl text-white placeholder-emerald-200/40 focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
+                className="w-full pl-10 pr-12 py-3 bg-black/40 border border-white/20 rounded-xl text-white placeholder-emerald-300/70 text-base focus:outline-none focus:ring-2 focus:ring-[#519c61] focus:border-transparent transition-all duration-200"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-emerald-300/60 hover:text-white transition-colors"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-emerald-100 hover:text-white transition-colors"
               >
                 {showPassword ? "👁️" : "🙈"}
               </button>
@@ -160,11 +190,11 @@ const Userlogin = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-[#519c61] hover:bg-[#62ad72] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-[#519c61]/30 hover:shadow-[#519c61]/40 transition-all duration-200 mt-2"
+            className="w-full bg-[#519c61] hover:bg-[#62ad72] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none text-white font-extrabold text-lg py-3.5 px-4 rounded-xl shadow-lg shadow-[#519c61]/40 hover:shadow-[#519c61]/60 transition-all duration-200 mt-2"
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                 Logging in...
               </span>
             ) : (
@@ -174,12 +204,12 @@ const Userlogin = () => {
 
         </form>
 
-<Link 
-  to="/register" 
-  className='text-emerald-300 hover:text-white text-sm mt-6 transition-colors duration-200 block text-center'
->
-  Create new account
-</Link>
+        <Link 
+          to="/register" 
+          className='text-emerald-100 hover:text-white text-base font-semibold mt-6 transition-colors duration-200 block text-center'
+        >
+          Create new account
+        </Link>
       </div>
     </div>
   );
