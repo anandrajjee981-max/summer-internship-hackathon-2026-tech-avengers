@@ -53,7 +53,7 @@ res.status(201).json({
 
 async function logincontroller(req, res) {
 
-    const { username, password } = req.body
+    const { username, password ,gymcode} = req.body
 
     const user = await usermodel.findOne({ username })
 

@@ -11,9 +11,9 @@ const App = () => {
   return (
 <main className='bg-black'>
 <Routes>
+  <Route path='/' element={<Superadmin/>}/>
 <Route path='/login' element ={<Userlogin/>}/>
 <Route path='/register' element ={<Register/>}/>
-<Route  path='/super' element ={<Superadmin/>}/>
 <Route path='/adminlogin' element={<Admin/>}></Route>
 <Route path='/superlogin' element= {<Superlogin/>}></Route>
 <Route path='/adminregister' element = {<Registeradmin/>}></Route>
