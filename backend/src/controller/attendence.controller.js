@@ -1,11 +1,14 @@
 const jwt = require("jsonwebtoken")
 
-const attendmodel = require("../model/attendence.model")
+const attendmodel =
+require("../model/attendence.model")
 
-const usermodel = require("../model/usermodel")
+const usermodel =
+require("../model/usermodel")
 
-// ENTRY CONTROLLER
-async function attendenter(req, res) {
+const QRCode = require("qrcode")
+
+async function scanattendence(req, res) {
 
     try {
 
@@ -15,11 +18,11 @@ async function attendenter(req, res) {
         if (!token) {
 
             return res.status(401).json({
-                message: "token required"
+                message: "token expired relogin"
             })
         }
 
-        // VERIFY TOKEN
+        // VERIFY
         let decoded
 
         try {
@@ -36,8 +39,9 @@ async function attendenter(req, res) {
             })
         }
 
-        // FIND USER
-        const user = await usermodel.findById(decoded.id)
+        // USER
+        const user =
+        await usermodel.findById(decoded.id)
 
         if (!user) {
 
@@ -46,8 +50,14 @@ async function attendenter(req, res) {
             })
         }
 
-        // CHECK ALREADY INSIDE
-        const alreadyinside =
+        // QR GENERATE
+        const qrimage =
+        await QRCode.toDataURL(
+            user.gymcode
+        )
+
+        // ACTIVE SESSION
+        const activeSession =
         await attendmodel.findOne({
 
             user: user._id,
@@ -55,14 +65,28 @@ async function attendenter(req, res) {
             status: "INSIDE"
         })
 
-        if (alreadyinside) {
+        // EXIT
+        if (activeSession) {
 
-            return res.status(400).json({
-                message: "user already inside"
+            activeSession.exittime =
+            new Date()
+
+            activeSession.status =
+            "OUTSIDE"
+
+            await activeSession.save()
+
+            return res.status(200).json({
+
+                message: "exit successful",
+
+                qrimage,
+
+                attendance: activeSession
             })
         }
 
-        // CREATE ATTENDANCE
+        // ENTRY
         const attendance =
         await attendmodel.create({
 
@@ -83,6 +107,8 @@ async function attendenter(req, res) {
 
             message: "entry successful",
 
+            qrimage,
+
             attendance
         })
 
@@ -90,112 +116,11 @@ async function attendenter(req, res) {
 
         res.status(500).json({
 
-            message: "internal server error",
-
-            error: err.message
-        })
-    }
-}
-
-// EXIT CONTROLLER
-async function attendexit(req, res) {
-
-    try {
-
-        // TOKEN
-        const token = req.cookies.tokens
-
-        if (!token) {
-
-            return res.status(401).json({
-                message: "token required"
-            })
-        }
-
-        // VERIFY TOKEN
-        let decoded
-
-        try {
-
-            decoded = jwt.verify(
-                token,
-                process.env.JWT_SECRET
-            )
-
-        } catch (err) {
-
-            return res.status(401).json({
-                message: "unauthorised access"
-            })
-        }
-
-        // FIND USER
-        const user = await usermodel.findById(decoded.id)
-
-        if (!user) {
-
-            return res.status(404).json({
-                message: "user not found"
-            })
-        }
-
-        // FIND ACTIVE SESSION
-        const activeSession =
-        await attendmodel.findOne({
-
-            user: user._id,
-
-            status: "INSIDE"
-        })
-
-        // USER ALREADY OUTSIDE
-        if (!activeSession) {
-
-            return res.status(400).json({
-                message: "user already outside"
-            })
-        }
-
-        // EXIT TIME
-        activeSession.exittime =
-        new Date()
-
-        // STATUS UPDATE
-        activeSession.status =
-        "OUTSIDE"
-
-        // DURATION
-        activeSession.duration =
-        Math.floor(
-
-            (
-                activeSession.exittime -
-                activeSession.entrytime
-            ) / 1000 / 60
-        )
-
-        // SAVE
-        await activeSession.save()
-
-        res.status(200).json({
-
-            message: "exit successful",
-
-            attendance: activeSession
-        })
-
-    } catch (err) {
-
-        res.status(500).json({
-
-            message: "internal server error",
-
-            error: err.message
+            message: err.message
         })
     }
 }
 
 module.exports = {
-    attendenter,
-    attendexit
+    scanattendence
 }

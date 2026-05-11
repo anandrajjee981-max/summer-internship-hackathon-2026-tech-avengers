@@ -1,6 +1,7 @@
 const gymmodel = require('../model/gymmodel')
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const QRCode = require("qrcode")
 
 async function registercontroller(req,res){
 const {gymname , email , password , phonenumber , gymcode} = req.body
@@ -82,6 +83,7 @@ async function logincontroller(req, res) {
         }
     })
 }
+
 module.exports = {
-    registercontroller , logincontroller
+    registercontroller , logincontroller 
 }
