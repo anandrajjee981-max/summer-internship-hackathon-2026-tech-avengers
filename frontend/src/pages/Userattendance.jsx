@@ -8,9 +8,11 @@ const Userattendance = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("https://summer-internship-hackathon-2026-tech.onrender.com/api/login/sheet");
+        const res = await axios.get(
+          "https://summer-internship-hackathon-2026-tech.onrender.com/api/login/sheet",
+          { withCredentials: true }
+        );
         
-        // FIX HERE: res.data ke andar se 'attendsheet' array ko nikal kar state me save kiya
         if (res.data && res.data.attendsheet) {
           setarr(res.data.attendsheet);
         }
@@ -25,161 +27,146 @@ const Userattendance = () => {
   }, []);
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h2 style={styles.title}>Attendance Sheet</h2>
-        <p style={styles.subtitle}>Track and manage daily attendance records</p>
+    /* Page Container: Match skin with deep background and a subtle top green gradient wash */
+    <div className="h-screen bg-[#030303] bg-gradient-to-b from-emerald-950/10 via-[#030303] to-[#030303] text-white font-sans px-4 py-6 md:py-8 md:px-6 flex flex-col overflow-hidden">
+      
+      {/* Header Section */}
+      <div className="max-w-[1200px] w-full mx-auto mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b border-[#121214] pb-4 shrink-0">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
+            Attendance Register
+          </h2>
+          <p className="text-[#6e6e77] text-xs md:text-sm font-medium">
+            Daily log of punch-ins, durations, and gym codes
+          </p>
+        </div>
+        <div className="bg-[#09090b] border border-[#162a1e]/30 px-4 py-2 rounded-xl text-xs text-[#a1a1aa] font-medium flex items-center gap-2 w-fit">
+          Total Records <span className="text-[#10b981] font-semibold bg-[#10b981]/10 px-2 py-0.5 rounded-md">{arr.length}</span>
+        </div>
       </div>
 
-      {loading ? (
-        <div style={styles.loaderContainer}>
-          <div style={styles.loader}></div>
-        </div>
-      ) : arr.length === 0 ? (
-        <div style={styles.noData}>No records found</div>
-      ) : (
-        <div style={styles.grid}>
-          {arr.map((elem, index) => (
-            <div key={elem._id || index} style={styles.card}>
-              {/* Status Badge Dynamically Colors Based on Value */}
-              <div style={{
-                ...styles.cardBadge,
-                backgroundColor: elem.status === 'INSIDE' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                color: elem.status === 'INSIDE' ? '#4ade80' : '#f87171'
-              }}>
-                {elem.status}
-              </div>
-              
-              {/* Displaying Gym Code and Date */}
-              <h3 style={styles.cardText}>Gym Code: {elem.gymcode}</h3>
-              <p style={{ color: '#a1a1aa', fontSize: '0.9rem', margin: '-15px 0 20px 0' }}>
-                Date: {elem.date}
-              </p>
-              
-              <div style={styles.cardFooter}>
-                <span>Duration: {elem.duration} mins</span>
-                <span style={styles.viewBtn}>Details →</span>
-              </div>
+      {/* Main Content Area - Handles infinite database entry overflows safely */}
+      <div className="max-w-[1200px] w-full mx-auto flex-1 flex flex-col min-h-0">
+        {loading ? (
+          <div className="flex justify-center items-center flex-1">
+            <div className="w-8 h-8 border-2 border-emerald-500/10 border-t-[#10b981] rounded-full animate-spin"></div>
+          </div>
+        ) : arr.length === 0 ? (
+          <div className="text-center text-[#71717a] my-auto py-12 text-sm font-medium">
+            No attendance records found
+          </div>
+        ) : (
+          /* Container Box with Custom Dark Scrollbar Logic */
+          <div className="w-full bg-[#09090b]/90 backdrop-blur-md border border-[#18181b] rounded-2xl flex flex-col min-h-0 overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.9)]">
+            
+            {/* Mobile Layout: Auto-scroll container inside card matrix */}
+            <div className="flex flex-col gap-3 p-4 overflow-y-auto md:hidden flex-1 custom-scrollbar">
+              {arr.map((elem, index) => (
+                <div key={elem._id || index} className="bg-[#0d0d11] border border-[#162a1e]/20 rounded-xl p-4 flex flex-col gap-3 hover:border-[#10b981]/20 transition-all">
+                  <div className="flex justify-between items-center border-b border-[#121214] pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-[#71717a] font-medium">#{index + 1}</span>
+                      <span className="text-sm font-semibold text-[#f4f4f5]">{elem.gymcode}</span>
+                    </div>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                      elem.status === 'INSIDE' 
+                        ? 'bg-emerald-500/10 text-[#4ade80] border-emerald-500/20' 
+                        : 'bg-red-500/10 text-[#f87171] border-red-500/15'
+                    }`}>
+                      <span className={`w-1 h-1 rounded-full ${elem.status === 'INSIDE' ? 'bg-[#4ade80]' : 'bg-[#f87171]'}`}></span>
+                      {elem.status}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <p className="text-[#71717a] mb-0.5">Date</p>
+                      <p className="text-[#cbd5e1] font-medium">{elem.date || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-[#71717a] mb-0.5">Duration</p>
+                      <p className="text-[#cbd5e1] font-medium">{elem.duration} mins</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-1 flex justify-end">
+                    <button className="text-[#10b981] text-xs font-semibold bg-[#10b981]/5 hover:bg-[#10b981]/10 px-3 py-1.5 rounded-lg active:scale-95 transition-all">
+                      Details →
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+
+            {/* Desktop Table Layout: Sticky header with content scroll bar protection */}
+            <div className="hidden md:block overflow-y-auto custom-scrollbar flex-1">
+              <table className="w-full text-left text-sm relative border-collapse">
+                <thead>
+                  <tr className="bg-[#0d0d11] text-[#71717a] text-xs font-semibold uppercase tracking-wider border-b border-[#18181b] sticky top-0 z-10">
+                    <th className="px-6 py-4 bg-[#0d0d11]">S.No.</th>
+                    <th className="px-6 py-4 bg-[#0d0d11]">Date</th>
+                    <th className="px-6 py-4 bg-[#0d0d11]">Gym Code</th>
+                    <th className="px-6 py-4 bg-[#0d0d11]">Duration</th>
+                    <th className="px-6 py-4 text-center bg-[#0d0d11]">Status</th>
+                    <th className="px-6 py-4 text-right bg-[#0d0d11]">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#121214]">
+                  {arr.map((elem, index) => (
+                    <tr key={elem._id || index} className="hover:bg-[#10b981]/[0.02] transition-colors duration-150 group">
+                      <td className="px-6 py-[16px] text-[#cbd5e1]">{index + 1}</td>
+                      <td className="px-6 py-[16px] text-[#cbd5e1]">{elem.date || "N/A"}</td>
+                      <td className="px-6 py-[16px] font-semibold text-[#f4f4f5]">{elem.gymcode}</td>
+                      <td className="px-6 py-[16px]">
+                        <span className="bg-[#121214] border border-[#27272a] px-3 py-1.5 rounded-lg text-xs text-[#e4e4e7] font-medium">
+                          {elem.duration} mins
+                        </span>
+                      </td>
+                      <td className="px-6 py-[16px] text-center">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold tracking-wide border ${
+                          elem.status === 'INSIDE' 
+                            ? 'bg-emerald-500/10 text-[#4ade80] border-emerald-500/20' 
+                            : 'bg-red-500/10 text-[#f87171] border-red-500/15'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${elem.status === 'INSIDE' ? 'bg-[#4ade80]' : 'bg-[#f87171]'}`}></span>
+                          {elem.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-[16px] text-right">
+                        <button className="text-[#10b981] group-hover:bg-[#10b981]/10 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200">
+                          Details →
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-// Premium Glassmorphism & Dark UI Styles
-const styles = {
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#0a0a0c',
-    color: '#ffffff',
-    fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    padding: '40px 20px',
-  },
-  header: {
-    maxWidth: '1200px',
-    margin: '0 auto 40px auto',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-    paddingBottom: '20px',
-  },
-  title: {
-    fontSize: '2rem',
-    fontWeight: '700',
-    letterSpacing: '-0.05em',
-    background: 'linear-gradient(to right, #ffffff, #a3a3a3)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    margin: '0 0 8px 0',
-  },
-  subtitle: {
-    color: '#71717a',
-    fontSize: '0.95rem',
-    margin: 0,
-  },
-  grid: {
-    maxWidth: '1200px',
-    margin: '0 auto',
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-    gap: '24px',
-  },
-  card: {
-    background: 'rgba(255, 255, 255, 0.03)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    borderRadius: '16px',
-    padding: '24px',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    cursor: 'pointer',
-    position: 'relative',
-    overflow: 'hidden',
-    boxShadow: '0 4px 30px rgba(0, 0, 0, 0.5)',
-  },
-  cardBadge: {
-    position: 'absolute',
-    top: '20px',
-    right: '24px',
-    padding: '4px 10px',
-    borderRadius: '20px',
-    fontSize: '0.75rem',
-    fontWeight: '600',
-    textTransform: 'uppercase'
-  },
-  cardText: {
-    fontSize: '1.25rem',
-    fontWeight: '600',
-    color: '#f4f4f5',
-    margin: '20px 0 20px 0',
-    lineHeight: '1.4',
-  },
-  cardFooter: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    fontSize: '0.85rem',
-    color: '#a1a1aa',
-    borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-    paddingTop: '16px',
-  },
-  viewBtn: {
-    color: '#3b82f6',
-    fontWeight: '500',
-  },
-  loaderContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '200px',
-  },
-  loader: {
-    width: '35px',
-    height: '35px',
-    border: '3px solid rgba(255, 255, 255, 0.1)',
-    borderTop: '3px solid #ffffff',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite',
-  },
-  noData: {
-    textAlign: 'center',
-    color: '#71717a',
-    marginTop: '40px',
-    fontSize: '1.1rem',
-  },
-};
-
+/* Custom Scrollbar Injection to match premium dark moss theme */
 if (typeof document !== 'undefined') {
   const styleSheet = document.createElement("style");
   styleSheet.innerText = `
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-    div[style*="background: rgba(255, 255, 255, 0.03)"]:hover {
-      transform: translateY(-5px);
-      border-color: rgba(255, 255, 255, 0.2) !important;
-      background: rgba(255, 255, 255, 0.05) !important;
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #09090b;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #162a1e; /* Dark matching green-slate track */
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #10b981; /* Highlighting to vibrant emerald on interactions */
     }
   `;
   document.head.appendChild(styleSheet);

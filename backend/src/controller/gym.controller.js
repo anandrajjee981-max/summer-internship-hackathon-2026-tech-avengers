@@ -2,7 +2,7 @@ const gymmodel = require('../model/gymmodel')
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const QRCode = require("qrcode")
-
+const usermodel = require('../model/usermodel')
 async function registercontroller(req,res){
   const { gymname, email, password, phonenumber, gymcode } = req.body
 
@@ -117,9 +117,75 @@ async function logincontroller(req, res) {
   })
 }
 
+async function membercount(req, res) {
+
+  try {
+
+    // TOKEN
+    const token = req.cookies.tokens
+
+    if (!token) {
+      return res.status(401).json({
+        message: "token expired relogin"
+      })
+    }
+
+    // VERIFY TOKEN
+    let decoded
+
+    try {
+
+      decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET
+      )
+
+    } catch (err) {
+
+      return res.status(401).json({
+        message: "unauthorised access"
+      })
+    }
+
+    // FIND GYM
+    const gym = await gymmodel.findById(decoded.id)
+
+    if (!gym) {
+
+      return res.status(404).json({
+        message: "gym not found"
+      })
+    }
+
+    // FIND USERS OF THIS GYM
+ const users = await usermodel.find(
+  { gymcode: gym.gymcode },
+  "username email"
+)
+
+    // RESPONSE
+    res.status(200).json({
+
+      message: "member list fetched successfully",
+
+      totalmembers: users.length,
+users 
+      
+    })
+
+  } catch (err) {
+
+    res.status(500).json({
+      message: err.message
+    })
+  }
+}
+
+
 module.exports = {
   registercontroller,
-  logincontroller
+  logincontroller ,
+  membercount
 }
 
 
