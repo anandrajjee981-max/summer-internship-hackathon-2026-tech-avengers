@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import axios from "axios";
+import Userattendance from "../pages/Userattendance";
 
 const Userpanel = () => {
   const [scanResult, setScanResult] = useState("");
@@ -231,6 +232,10 @@ const Userpanel = () => {
           height: 100% !important;
         }
       `}</style>
+
+      <div className=" w-full">
+        <Userattendance />
+      </div>
     </div>
   );
 };
