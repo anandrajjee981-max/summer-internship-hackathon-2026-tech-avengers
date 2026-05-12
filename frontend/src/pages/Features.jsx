@@ -11,11 +11,7 @@ const features = [
     description: "Get smart insights, member retention trends, and peak hour reports.",
     icon: "📊"
   },
-  {
-    title: "Membership & Payments",
-    description: "Fully automated billing, recurring payments, and instant invoice generation.",
-    icon: "💳"
-  },
+ 
   {
     title: "Multi-Gym SaaS Platform",
     description: "Manage multiple branches, staff, and overall business from a single dashboard.",
@@ -31,16 +27,7 @@ const features = [
     description: "Live floor occupancy tracker and instant member check-in updates.",
     icon: "⏱️"
   },
-  {
-    title: "Smart Notifications",
-    description: "Automatic WhatsApp, SMS, and Push alerts for renewals and birthdays.",
-    icon: "🔔"
-  },
-  {
-    title: "AI Workout & Diet",
-    description: "Personalized plans powered by AI matching individual fitness goals.",
-    icon: "🤖"
-  }
+
 ];
 
 const Features = () => {

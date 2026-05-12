@@ -32,9 +32,11 @@ app.use(cookieparser());
 const userroutes = require('../src/routes/user.routes');
 const gymroutes = require('../src/routes/gym.routes');
 const attendroutes = require('../src/routes/attendence.routes');
+const superroute = require('../src/routes/super.routes')
 
 app.use("/api/auth", userroutes);
 app.use("/api/auths", gymroutes);   
 app.use("/api", attendroutes);
+app.use("/api/boss",superroute)
 
 module.exports = app;   

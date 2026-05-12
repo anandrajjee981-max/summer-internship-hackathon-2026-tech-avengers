@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Usercount from '../pages/Usercount';
 
 const AdminPanel = () => {
   const [qrImage, setQrImage] = useState("");
@@ -86,11 +87,15 @@ const AdminPanel = () => {
               </div>
             </div>
             <p className="text-sm text-emerald-100/50 mt-6">
-              More dashboard features will update dynamically relative to the internship network parameters.
+        paste this qr and mark attendence digitally 
             </p>
           </div>
 
         </div>
+
+      </div>
+      <div className='w-full'>
+<Usercount/>
 
       </div>
     </div>
