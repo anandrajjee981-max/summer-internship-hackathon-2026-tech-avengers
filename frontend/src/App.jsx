@@ -8,6 +8,8 @@ import Superlogin from './pages/Superlogin'
 import Registeradmin from './pages/Registeradmin'
 import Userpanel from './panel/Userpanel'
 
+import Adminpanel from './panel/Adminpanel'
+
 const App = () => {
   return (
 <main className='bg-black'>
@@ -17,7 +19,9 @@ const App = () => {
 <Route path='/register' element ={<Register/>}/>
 <Route path='/adminlogin' element={<Admin/>}></Route>
 <Route path='/superlogin' element= {<Superlogin/>}></Route>
+<Route path='/adminpanel' element = {<Adminpanel/>} />
 <Route path='/adminregister' element = {<Registeradmin/>}></Route>
+
 <Route path='/user' element = {<Userpanel/>} />
 </Routes>
 {/* <Userlogin/> */}

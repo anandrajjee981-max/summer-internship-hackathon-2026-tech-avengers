@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'; // Import added
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 const Admin = () => {
@@ -7,6 +7,8 @@ const Admin = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [img, setimg] = useState("");
+  const [isdisplay, setisdisplay] = useState(false);
 
   // Fetch initial data on mount
   useEffect(() => {
@@ -39,9 +41,19 @@ const Admin = () => {
     )
       .then((res) => {
         console.log(res.data);
+        setisdisplay(true); 
         setIsError(false);
-        setDisplay("Admin Login successful! Welcome back.");
+        setDisplay("Admin Login successful!");
         setIsLoading(false);
+
+        // ✅ Save to local state
+        setimg(res.data.qrimage);
+
+        // ✅ Save to LocalStorage for AdminPanel to access
+        if (res.data.qrimage) {
+          localStorage.setItem('adminQrImage', res.data.qrimage);
+        }
+
         e.target.reset();
       })
       .catch((err) => {
@@ -65,7 +77,6 @@ const Admin = () => {
   }
 
   return (
-    // Matching Premium Dark Green Theme
     <div className="bg-gradient-to-br from-[#0a1f11] via-[#102b18] to-[#16361e] w-full min-h-screen flex flex-col items-center justify-center font-sans px-4 py-10">
       
       {/* Admin Login Card */}
@@ -103,7 +114,7 @@ const Admin = () => {
           {/* Gym Name */}
           <div>
             <label className="block text-sm font-bold text-white uppercase tracking-wider mb-2">
-              Gym Name
+              Camp Name
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-100">
@@ -179,8 +190,17 @@ const Admin = () => {
               "Log In"
             )}
           </button>
+        </form>   
 
-        </form>
+        {isdisplay && (
+          <div className="mt-4">
+            <Link to='/adminpanel'>
+              <button className="w-full py-3 px-4 text-center text-base font-extrabold rounded-xl text-white bg-emerald-600 hover:bg-emerald-500 shadow-md transition-all duration-200">
+                Let's Go! 🚀
+              </button>
+            </Link>
+          </div>
+        )}
 
         <Link 
           to="/adminregister" 

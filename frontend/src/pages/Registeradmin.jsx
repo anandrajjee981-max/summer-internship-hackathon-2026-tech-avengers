@@ -173,6 +173,10 @@ const Registeradmin = () => {
         </Link>
 
       </div>
+
+
+
+
     </div>
   );
 };

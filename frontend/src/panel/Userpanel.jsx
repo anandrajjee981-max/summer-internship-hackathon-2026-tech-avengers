@@ -6,6 +6,7 @@ const Userpanel = () => {
   const [scanResult, setScanResult] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [img, setimg] = useState("");
   
   const html5QrCodeRef = useRef(null);
 
@@ -80,11 +81,12 @@ const Userpanel = () => {
 
     try {
       const response = await axios.post(
-        "https://summer-internship-hackathon-2026-tech.onrender.com/api/login/enter",
+        "https://summer-internship-hackathon-2026-tech.onrender.com/api/login/check",
         { gymcode: decodedText },
         { withCredentials: true }
       );
       alert(`🎉 ${response.data.message || "Access Granted!"}`);
+      setimg(response.qrimage)
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Verification failed. Please try again.");
@@ -105,7 +107,7 @@ const Userpanel = () => {
 
   return (
     <div className="bg-gradient-to-br from-[#051109] via-[#0b1f11] to-[#12311a] w-full min-h-screen flex flex-col justify-center items-center font-sans px-4 py-10">
-      
+
       {/* Main Glassmorphic Card */}
       <div className="w-full max-w-md bg-black/40 backdrop-blur-2xl rounded-3xl p-8 border border-emerald-500/15 shadow-[0_0_50px_rgba(16,185,129,0.1)] text-center relative overflow-hidden">
         
