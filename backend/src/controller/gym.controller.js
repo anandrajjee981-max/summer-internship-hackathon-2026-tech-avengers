@@ -41,7 +41,12 @@ async function registercontroller(req,res){
     { expiresIn: "1d" }
   )
 
-  res.cookie("tokens", token)
+        res.cookie("tokens", token, {
+            httpOnly: true,
+            secure: true,      // Required for HTTPS
+            sameSite: "none",  // Required for Cross-Origin cookie transmission
+            maxAge: 24 * 60 * 60 * 1000 // 1 Day expiration
+        });
 
   res.status(201).json({
     message: "register successfully",
@@ -85,7 +90,12 @@ async function logincontroller(req, res) {
     { expiresIn: "1d" }
   )
 
-  res.cookie("tokens", token)
+        res.cookie("tokens", token, {
+            httpOnly: true,
+            secure: true,      // Required for HTTPS
+            sameSite: "none",  // Required for Cross-Origin cookie transmission
+            maxAge: 24 * 60 * 60 * 1000 // 1 Day expiration
+        });
 
   // 🔥 QR GENERATE ON LOGIN ALSO (optional)
   const qrimage = await QRCode.toDataURL(
