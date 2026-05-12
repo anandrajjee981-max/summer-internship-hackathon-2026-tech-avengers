@@ -20,7 +20,7 @@ const Userpanel = () => {
       setIsCameraActive(true);
       
       await html5QrCodeRef.current.start(
-        { facingMode: "environment" },
+        { facingMode: "environment" }, // Prioritize back camera on mobile devices
         {
           fps: 10,
           qrbox: { width: 250, height: 250 },
@@ -29,17 +29,17 @@ const Userpanel = () => {
           handleSuccess(decodedText);
         },
         (errorMessage) => {
-          // Soft tracking errors ignored
+          // Soft tracking errors safely handled internally by library
         }
       );
     } catch (err) {
       console.error("Camera start error:", err);
-      alert("Could not start camera. Please check permissions.");
+      alert("Could not start camera. Please check system hardware/permissions.");
       setIsCameraActive(false);
     }
   };
 
-  // 2. Camera Stop
+  // 2. Camera Stop Hook
   const stopCamera = async () => {
     if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
       await html5QrCodeRef.current.stop();
@@ -47,7 +47,7 @@ const Userpanel = () => {
     }
   };
 
-  // 3. Gallery File Scanner
+  // 3. Gallery File Upload and Parsing
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -66,25 +66,28 @@ const Userpanel = () => {
       handleSuccess(decodedText);
     } catch (err) {
       console.error("File scan error:", err);
-      alert("Could not find any valid QR Code in this image. Try another one!");
+      alert("Could not locate a recognizable QR code inside this image. Try capturing a clearer shot!");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Common Success Handler
+  // 4. Common Response Processor
   const handleSuccess = async (decodedText) => {
-    console.log("Scanned Content:", decodedText);
-    setScanResult(decodedText);
+    // Standard cleanup: Trim whitespace inputs immediately 
+    const cleanScannedText = decodedText ? decodedText.trim() : "";
+    
+    console.log("Clean Scanned Content Target:", cleanScannedText);
+    setScanResult(cleanScannedText);
     setIsProcessing(true);
 
-    // Stop camera immediately upon detection so it doesn't loop fire requests
+    // Stop physical hardware camera instantly to prevent repetitive duplicate tracking loops
     await stopCamera();
 
     try {
       const response = await axios.post(
         "https://summer-internship-hackathon-2026-tech.onrender.com/api/login/check",
-        { gymcode: decodedText },
+        { gymcode: cleanScannedText }, // Sending cleaned payload data string
         { withCredentials: true }
       );
       
@@ -93,18 +96,18 @@ const Userpanel = () => {
         setimg(response.data.qrimage);
       }
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Verification failed. Please try again.");
+      console.error("Verification processing failed:", err);
+      alert(err.response?.data?.message || "Verification endpoint rejected code. Please retry.");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Cleanup on Unmount
+  // Automatic cleanup hook when routing away from component
   useEffect(() => {
     return () => {
       if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
-        html5QrCodeRef.current.stop().catch(err => console.error(err));
+        html5QrCodeRef.current.stop().catch(err => console.error("Unmount cleanup warning:", err));
       }
     };
   }, []);
@@ -117,7 +120,7 @@ const Userpanel = () => {
         
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-[#10b981] to-transparent"></div>
 
-        {/* Header */}
+        {/* Header Section */}
         <div className="mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 mb-4 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
             <span className="text-3xl">🛡️</span>
@@ -130,7 +133,7 @@ const Userpanel = () => {
           </p>
         </div>
 
-        {/* Custom Video Area */}
+        {/* Media Layout Viewbox */}
         <div className="relative rounded-2xl border-2 border-emerald-500/20 bg-black/60 overflow-hidden mb-6 aspect-square max-w-[280px] mx-auto flex items-center justify-center">
           
           <div 
@@ -150,7 +153,7 @@ const Userpanel = () => {
           )}
         </div>
 
-        {/* Action Controls */}
+        {/* Interactive Element Buttons */}
         <div className="space-y-4">
           {!isCameraActive ? (
             <button
@@ -203,6 +206,7 @@ const Userpanel = () => {
 
       </div>
 
+      {/* Scannable Element Stylesheets */}
       <style>{`
         @keyframes scan {
           0% { top: 0%; }
