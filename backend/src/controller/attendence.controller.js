@@ -5,7 +5,7 @@ const usermodel = require("../model/usermodel");
 async function scanattendence(req, res) {
   try {
     const token = req.cookies.tokens;
-    const { gymcode } = req.body; // <-- Extract payload from the frontend scanner
+    const { gymcode } = req.body; 
 
     if (!token) {
       return res.status(401).json({ message: "Session expired, please login again" });
@@ -27,9 +27,17 @@ async function scanattendence(req, res) {
       return res.status(404).json({ message: "User profile not found" });
     }
 
-    // Crucial Security Step: Verify if scanned code matches the user's assigned gym code
-    if (user.gymcode !== gymcode) {
-      return res.status(403).json({ message: "Invalid gym code scan for this account" });
+    // ✅ FIX: Clean and normalize both strings before checking
+    const savedCode = String(user.gymcode).trim().toLowerCase();
+    const scannedCode = String(gymcode).trim().toLowerCase();
+
+    console.log(`[DEBUG] DB Code: "${savedCode}" | Scanned Code: "${scannedCode}"`);
+
+    // Case-insensitive matching to prevent false rejection crashes
+    if (savedCode !== scannedCode) {
+      return res.status(403).json({ 
+        message: `Invalid gym code scan. Database expected: ${user.gymcode}, but Scanner read: ${gymcode}` 
+      });
     }
 
     // CHECK FOR ACTIVE "INSIDE" SESSION FOR EXIT TRIGGER
