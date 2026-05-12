@@ -76,7 +76,37 @@ async function scanattendence(req, res) {
     return res.status(500).json({ message: err.message });
   }
 }
+async function attendencecount(req,res){
+  const token = req.cookies.tokens;
+if(!token) {
+return res.status(404).json({
+  message : "token expire"
+})
+}
+let decoded 
+try{
+decoded = jwt.verify(token, process.env.JWT_SECRET)
+}
+  catch(err){
+return res.status(404).json({
+  message : "unauthorise acess"
+})
 
+}  
+let attendsheet = await attendmodel.find({user : decoded.id})
+if (! attendsheet){
+  return res.status(404).json({
+    message : "no attendence record"
+  })
+
+}
+res.status(201).json({
+  message : "here is your full details of attendence" ,
+  attendsheet
+})
+
+
+}
 module.exports = {
-  scanattendence
+  scanattendence , attendencecount
 };

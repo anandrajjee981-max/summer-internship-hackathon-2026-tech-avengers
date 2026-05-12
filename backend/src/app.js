@@ -37,4 +37,4 @@ app.use("/api/auth", userroutes);
 app.use("/api/auths", gymroutes);   
 app.use("/api", attendroutes);
 
-module.exports = app;
+module.exports = app;   
