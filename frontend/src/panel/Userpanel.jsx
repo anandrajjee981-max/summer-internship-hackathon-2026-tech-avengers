@@ -74,11 +74,23 @@ const Userpanel = () => {
 
   // 4. Common Response Processor
   const handleSuccess = async (decodedText) => {
-    // Standard cleanup: Trim whitespace inputs immediately 
-    const cleanScannedText = decodedText ? decodedText.trim() : "";
+    // Basic formatting: Trim whitespace inputs immediately 
+    let cleanGymCode = decodedText ? decodedText.trim() : "";
     
-    console.log("Clean Scanned Content Target:", cleanScannedText);
-    setScanResult(cleanScannedText);
+    // ✅ FIX: Checking if scanned string is a JSON Object structure
+    if (cleanGymCode.startsWith('{')) {
+      try {
+        const parsedJSON = JSON.parse(cleanGymCode);
+        if (parsedJSON && parsedJSON.gymcode) {
+          cleanGymCode = parsedJSON.gymcode; // Extracting clean value "gy83" from inside the parsed object
+        }
+      } catch (e) {
+        console.warn("Data looks like JSON but parsing failed. Using original string format instead.");
+      }
+    }
+
+    console.log("Final code payload sending to backend endpoint:", cleanGymCode);
+    setScanResult(cleanGymCode);
     setIsProcessing(true);
 
     // Stop physical hardware camera instantly to prevent repetitive duplicate tracking loops
@@ -87,7 +99,7 @@ const Userpanel = () => {
     try {
       const response = await axios.post(
         "https://summer-internship-hackathon-2026-tech.onrender.com/api/login/check",
-        { gymcode: cleanScannedText }, // Sending cleaned payload data string
+        { gymcode: cleanGymCode }, // Sending cleaned payload data string
         { withCredentials: true }
       );
       
