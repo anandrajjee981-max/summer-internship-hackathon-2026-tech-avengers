@@ -9,6 +9,7 @@ import Registeradmin from './pages/Registeradmin'
 import Userpanel from './panel/Userpanel'
 
 import Adminpanel from './panel/Adminpanel'
+import Gym from './pages/Gym'
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
 <Route path='/superlogin' element= {<Superlogin/>}></Route>
 <Route path='/adminpanel' element = {<Adminpanel/>} />
 <Route path='/adminregister' element = {<Registeradmin/>}></Route>
+<Route  path='/gym'   element ={<Gym/>} />
 
 <Route path='/user' element = {<Userpanel/>} />
 </Routes>

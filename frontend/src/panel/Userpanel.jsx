@@ -11,17 +11,22 @@ const Userpanel = () => {
   
   const html5QrCodeRef = useRef(null);
 
+  // Helper to ensure instance is ready
+  const getScannerInstance = () => {
+    if (!html5QrCodeRef.current) {
+      html5QrCodeRef.current = new Html5Qrcode("reader");
+    }
+    return html5QrCodeRef.current;
+  };
+
   // 1. Camera Scanner Start
   const startCamera = async () => {
     try {
-      if (!html5QrCodeRef.current) {
-        html5QrCodeRef.current = new Html5Qrcode("reader");
-      }
-      
+      const scanner = getScannerInstance();
       setIsCameraActive(true);
       
-      await html5QrCodeRef.current.start(
-        { facingMode: "environment" }, // Prioritize back camera on mobile devices
+      await scanner.start(
+        { facingMode: "environment" }, 
         {
           fps: 10,
           qrbox: { width: 250, height: 250 },
@@ -30,7 +35,7 @@ const Userpanel = () => {
           handleSuccess(decodedText);
         },
         (errorMessage) => {
-          // Soft tracking errors safely handled internally by library
+          // Soft tracking errors handled internally
         }
       );
     } catch (err) {
@@ -43,28 +48,44 @@ const Userpanel = () => {
   // 2. Camera Stop Hook
   const stopCamera = async () => {
     if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
-      await html5QrCodeRef.current.stop();
-      setIsCameraActive(false);
+      try {
+        await html5QrCodeRef.current.stop();
+      } catch (err) {
+        console.error("Error while stopping camera:", err);
+      } finally {
+        setIsCameraActive(false);
+      }
     }
   };
 
-  // 3. Gallery File Upload and Parsing
+  // 3. Gallery File Upload and Parsing ✅ [FIXED]
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!html5QrCodeRef.current) {
-      html5QrCodeRef.current = new Html5Qrcode("reader");
-    }
-
-    if (html5QrCodeRef.current.isScanning) {
-      await stopCamera();
-    }
-
     setIsProcessing(true);
+
     try {
-      const decodedText = await html5QrCodeRef.current.scanFile(file, true);
-      handleSuccess(decodedText);
+      // Agar camera chal raha hai, toh pehle use cleanly stop karo
+      if (html5QrCodeRef.current && html5QrCodeRef.current.isScanning) {
+        await stopCamera();
+      }
+
+      // Naya instance create karte hain taaki purani settings flush ho jayein
+      if (html5QrCodeRef.current) {
+        // Purane instance ko safety ke liye clear out karo
+        html5QrCodeRef.current = null;
+      }
+      
+      const scanner = getScannerInstance();
+      
+      // scanFile approach directly files process karega bina visual target rendering issue ke
+      const decodedText = await scanner.scanFile(file, true);
+      
+      // Target input reset taaki same image dobara upload karne par change fire ho sake
+      e.target.value = ""; 
+      
+      await handleSuccess(decodedText);
     } catch (err) {
       console.error("File scan error:", err);
       alert("Could not locate a recognizable QR code inside this image. Try capturing a clearer shot!");
@@ -75,15 +96,13 @@ const Userpanel = () => {
 
   // 4. Common Response Processor
   const handleSuccess = async (decodedText) => {
-    // Basic formatting: Trim whitespace inputs immediately 
     let cleanGymCode = decodedText ? decodedText.trim() : "";
     
-    // ✅ FIX: Checking if scanned string is a JSON Object structure
     if (cleanGymCode.startsWith('{')) {
       try {
         const parsedJSON = JSON.parse(cleanGymCode);
         if (parsedJSON && parsedJSON.gymcode) {
-          cleanGymCode = parsedJSON.gymcode; // Extracting clean value "gy83" from inside the parsed object
+          cleanGymCode = parsedJSON.gymcode; 
         }
       } catch (e) {
         console.warn("Data looks like JSON but parsing failed. Using original string format instead.");
@@ -94,13 +113,13 @@ const Userpanel = () => {
     setScanResult(cleanGymCode);
     setIsProcessing(true);
 
-    // Stop physical hardware camera instantly to prevent repetitive duplicate tracking loops
+    // Stop camera instantly
     await stopCamera();
 
     try {
       const response = await axios.post(
         "https://summer-internship-hackathon-2026-tech.onrender.com/api/login/check",
-        { gymcode: cleanGymCode }, // Sending cleaned payload data string
+        { gymcode: cleanGymCode }, 
         { withCredentials: true }
       );
       
@@ -149,6 +168,7 @@ const Userpanel = () => {
         {/* Media Layout Viewbox */}
         <div className="relative rounded-2xl border-2 border-emerald-500/20 bg-black/60 overflow-hidden mb-6 aspect-square max-w-[280px] mx-auto flex items-center justify-center">
           
+          {/* Always keeping reader in DOM hierarchy for background processing initialization */}
           <div 
             id="reader" 
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isCameraActive ? 'opacity-100 z-10' : 'opacity-0 -z-10'}`}
@@ -219,7 +239,6 @@ const Userpanel = () => {
 
       </div>
 
-      {/* Scannable Element Stylesheets */}
       <style>{`
         @keyframes scan {
           0% { top: 0%; }
@@ -233,7 +252,7 @@ const Userpanel = () => {
         }
       `}</style>
 
-      <div className=" w-full">
+      <div className="w-full">
         <Userattendance />
       </div>
     </div>
