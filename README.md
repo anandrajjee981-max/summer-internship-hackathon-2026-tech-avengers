@@ -284,7 +284,11 @@ Password : test
 
 These credentials are only for demo/testing purposes.
 
+# 🏗 Project Architecture
 
+View the complete system architecture diagram here:
+
+🔗 [Open Excalidraw Architecture Diagram](https://excalidraw.com/#json=TXflQkhL4veQcJ27mlGQ3,UcnJQz8C9OEloirWRjxu7A)
 
 # 🌟 Future Improvements
 
@@ -301,7 +305,8 @@ These credentials are only for demo/testing purposes.
 
 # 👨‍💻 Developer
 
-Anand raj
+Anand raj 
+
 saksham 
 
 Passionate Full Stack Developer focused on building scalable and modern web applications.
