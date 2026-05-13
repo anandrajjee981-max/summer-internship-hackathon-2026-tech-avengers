@@ -249,6 +249,42 @@ If user is already INSIDE:
 * Interactive QR Scanner Interface
 
 ---
+# 🔑 Demo Credentials
+
+## 👤 User Panel
+
+```txt id="ymrjvf"
+Username : anand-super
+Password : test
+Gym Code : gy83
+```
+
+---
+
+## 🛠 Admin Panel
+
+```txt id="jgh0db"
+Gym Name : vijay gym
+Password : test
+Gym Code : gy83
+```
+
+---
+
+## 👑 Super Admin Panel
+
+```txt id="gk1prx"
+Username : anand-boss
+Password : test
+```
+
+---
+
+# ⚠️ Note
+
+These credentials are only for demo/testing purposes.
+
+
 
 # 🌟 Future Improvements
 
@@ -265,8 +301,8 @@ If user is already INSIDE:
 
 # 👨‍💻 Developer
 
-**Anand Raj**
-**Saksham**
+Anand raj
+saksham 
 
 Passionate Full Stack Developer focused on building scalable and modern web applications.
 
