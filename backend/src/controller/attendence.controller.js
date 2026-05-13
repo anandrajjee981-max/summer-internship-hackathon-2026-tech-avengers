@@ -56,7 +56,12 @@ async function scanattendence(req, res) {
         message: "Exit registration successful!",
         attendance: activeSession,
       });
+      const durationMs = exitTime - activeSession.entrytime; 
+      activeSession.duration = Math.round(durationMs / (1000 * 60)); // Saving duration in minutes
+
+      await activeSession.save();
     }
+    
 
     // IF OUTSIDE, TRIGGER ENTRY LOGIC
     const attendance = await attendmodel.create({
@@ -66,6 +71,7 @@ async function scanattendence(req, res) {
       status: "INSIDE",
       date: new Date().toISOString().split("T")[0],
     });
+
 
     return res.status(201).json({
       message: "Entry registration successful!",
