@@ -10,6 +10,8 @@ import Userpanel from './panel/Userpanel'
 
 import Adminpanel from './panel/Adminpanel'
 import Gym from './pages/Gym'
+import UserDashboard from './panel/UserDashboard'
+import Userattendance from './pages/Userattendance'
 
 const App = () => {
   return (
@@ -23,8 +25,9 @@ const App = () => {
 <Route path='/adminpanel' element = {<Adminpanel/>} />
 <Route path='/adminregister' element = {<Registeradmin/>}></Route>
 <Route  path='/gym'   element ={<Gym/>} />
-
+<Route path = '/userdash' element = { <UserDashboard/>} />
 <Route path='/user' element = {<Userpanel/>} />
+<Route path='/attend'     element = {<Userattendance/>}            />
 </Routes>
 {/* <Userlogin/> */}
 

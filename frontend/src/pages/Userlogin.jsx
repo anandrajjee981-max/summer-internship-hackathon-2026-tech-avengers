@@ -208,7 +208,7 @@ const Userlogin = () => {
         {/* Conditional "Let's Go" Button (FIXED) */}
         {isdisplay && (
           <div className="mt-4">
-            <Link to='/user'>
+            <Link to='/userdash'>
               <button className="w-full py-3 px-4 text-center text-base font-extrabold rounded-xl text-white bg-emerald-600 hover:bg-emerald-500 shadow-md transition-all duration-200">
                 Let's Go! 🚀
               </button>

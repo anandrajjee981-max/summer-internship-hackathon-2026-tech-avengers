@@ -252,9 +252,7 @@ const Userpanel = () => {
         }
       `}</style>
 
-      <div className="w-full">
-        <Userattendance />
-      </div>
+ 
     </div>
   );
 };

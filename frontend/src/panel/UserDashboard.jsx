@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const UserDashboard = () => {
   const features = [
@@ -37,7 +38,7 @@ const UserDashboard = () => {
 
           <div className="absolute bottom-6 left-6">
             <h1 className="text-3xl font-black tracking-tight">
-              TITAN FITNESS CLUB
+               FITNESS CLUB
             </h1>
             <p className="text-emerald-300 text-sm font-medium">
               Transform Your Body • Transform Your Life
@@ -53,7 +54,7 @@ const UserDashboard = () => {
           <div className="relative">
             <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-emerald-500/30">
               <img
-                src="https://via.placeholder.com/150"
+                src="https://i.pinimg.com/1200x/75/c6/af/75c6af9672cf147f81b3054f0876472e.jpg"
                 alt="user"
                 className="w-full h-full object-cover"
               />
@@ -63,7 +64,7 @@ const UserDashboard = () => {
           </div>
 
           <div>
-            <h2 className="text-2xl font-black">Hi, Saksham Kumar 👋</h2>
+            <h2 className="text-2xl font-black">Hi, user 👋</h2>
             <p className="text-emerald-400/70 font-medium">
               Pro Member • Gym Management System
             </p>
@@ -77,9 +78,13 @@ const UserDashboard = () => {
           <h3 className="text-lg font-bold uppercase tracking-widest text-emerald-400">
             Your Plan Details
           </h3>
-          <button className="px-5 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition">
-            🖨 Print
+          <Link  to='/user' >
+          
+           <button className="px-5 py-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition">
+            📸 scan 
           </button>
+          </Link>
+         
         </div>
 
         <div className="bg-black/40 backdrop-blur-2xl rounded-3xl p-6 border border-emerald-500/15 shadow-lg">
@@ -141,9 +146,13 @@ const UserDashboard = () => {
 
       {/* BOTTOM BUTTON */}
       <div className="max-w-5xl mx-auto mt-10">
-        <button className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600/20 to-emerald-900/20 border border-emerald-500/30 text-emerald-400 font-black uppercase hover:from-emerald-500 hover:to-emerald-700 hover:text-white transition-all">
-          Log Today's Workout
+        <Link to='/attend' >
+           <button className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600/20 to-emerald-900/20 border border-emerald-500/30 text-emerald-400 font-black uppercase hover:from-emerald-500 hover:to-emerald-700 hover:text-white transition-all">
+        your attendence sheet 
         </button>
+        
+        </Link>
+     
       </div>
     </div>
   );
