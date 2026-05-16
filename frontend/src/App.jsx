@@ -12,6 +12,7 @@ import Adminpanel from './panel/Adminpanel'
 import Gym from './pages/Gym'
 import UserDashboard from './panel/UserDashboard'
 import Userattendance from './pages/Userattendance'
+import AdminPanel from './panel/AdminPanal'
 
 const App = () => {
   return (
@@ -27,7 +28,8 @@ const App = () => {
 <Route  path='/gym'   element ={<Gym/>} />
 <Route path = '/userdash' element = { <UserDashboard/>} />
 <Route path='/user' element = {<Userpanel/>} />
-<Route path='/attend'     element = {<Userattendance/>}            />
+<Route path='/attend'     element = {<Userattendance/>}  />
+<Route path='/admin' element = {<AdminPanel/>} />
 </Routes>
 {/* <Userlogin/> */}
 

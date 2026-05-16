@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const gymmodel = require('../model/gymmodel');
 
+
 async function registercontroller(req, res) {
     try {
         const { username, email, password, phonenumber, gymcode } = req.body;
@@ -124,7 +125,52 @@ async function logincontroller(req, res) {
     }
 }
 
+// Make sure you have app.use(cookieParser()) at the top of your server file!
+
+async function getme(req, res) {
+    try {
+        const token = req.cookies.tokens; 
+        if (!token) {
+            return res.status(401).json({
+                message: "No token provided, authorization denied"
+            });
+        }
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({
+                message: "Unauthorized access, invalid or expired token"
+            });
+        }
+
+        const user = await usermodel.findById(decoded.id);
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            message: "User details fetched successfully",
+            user: {
+                username: user.username,
+                id: user._id,
+                email: user.email
+            }
+        });
+
+    } catch (globalErr) {
+        // Catch-all for database connection errors or server crashes
+        console.error(globalErr);
+        return res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+}
+
 module.exports = {
     registercontroller,
-    logincontroller
+    logincontroller ,
+    getme
 };
