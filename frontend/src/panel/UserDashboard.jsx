@@ -1,7 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const UserDashboard = () => {
+  const [username, setusername] = useState("");
+  const [email, setemail] = useState("");
+  const [id, setid] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const features = [
     { id: 1, title: "Workout Plan", icon: "🏋️‍♂️", desc: "Today's training routine", glow: "group-hover:border-emerald-500/50" },
     { id: 2, title: "Diet Chart", icon: "🥗", desc: "Daily nutrition plan", glow: "group-hover:border-teal-500/50" },
@@ -22,6 +28,29 @@ const UserDashboard = () => {
     { title: "Tax/Enroll", value: "0/100", icon: "🧾", textColor: "text-slate-400" },
   ];
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await axios.get(
+          "https://summer-internship-hackathon-2026-tech.onrender.com/api/auth/getme",
+          { withCredentials: true } // Cookies ya tokens authentication ke liye safe side check
+        );
+        
+        if (res.data && res.data.user) {
+          setusername(res.data.user.username);
+          setemail(res.data.user.email);
+          // Agar database se id mil rahi hai toh short ID show karne ke liye slice kiya hai
+          setid(res.data.user.id || res.data.user._id || "N/A");
+        }
+      } catch (error) {
+        console.error("Error fetching user dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-[#040e07] via-[#091b0f] to-[#112f1a] text-slate-100 px-4 py-6 sm:py-10 font-sans antialiased overflow-x-hidden">
@@ -29,7 +58,6 @@ const UserDashboard = () => {
       {/* 1. TOP HERO BANNER */}
       <div className="max-w-5xl mx-auto mb-8">
         <div className="relative rounded-[2rem] overflow-hidden border border-emerald-950 shadow-2xl group">
-          {/* Subtle Radial Gradient overlay to blend top portion */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#06170d] via-black/30 to-transparent z-10" />
           
           <img
@@ -54,7 +82,7 @@ const UserDashboard = () => {
         </div>
       </div>
 
-      {/* 2. USER PROFILE BENTO CARD */}
+      {/* 2. USER PROFILE BENTO CARD (DYNAMIC DATA INTEGRATED) */}
       <div className="max-w-5xl mx-auto mb-8">
         <div className="bg-[#06170d]/60 border border-emerald-950 backdrop-blur-3xl rounded-[2rem] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl"></div>
@@ -72,10 +100,25 @@ const UserDashboard = () => {
             </div>
 
             <div>
-              <h2 className="text-xl sm:text-2xl font-black text-white">Hi, user 👋</h2>
-              <p className="text-emerald-500/70 text-xs sm:text-sm font-medium mt-0.5">
-                Pro Elite Member • <span className="text-emerald-400">ID: #INV1451</span>
-              </p>
+              {loading ? (
+                <div className="space-y-2">
+                  <div className="h-6 w-32 bg-emerald-950/60 animate-pulse rounded-md"></div>
+                  <div className="h-4 w-48 bg-emerald-950/40 animate-pulse rounded-md"></div>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-xl sm:text-2xl font-black text-white capitalize">
+                    Hi, {username || "Fitness Freak"} 👋
+                  </h2>
+                  <p className="text-emerald-500/70 text-xs sm:text-sm font-medium mt-0.5 flex flex-wrap gap-x-2 items-center">
+                    <span>Pro Elite Member</span>
+                    <span className="text-emerald-800">•</span>
+                    <span className="text-emerald-400 font-mono">ID: #{id ? id.toString().slice(-6).toUpperCase() : "1451"}</span>
+                    <span className="text-emerald-800 hidden sm:inline">•</span>
+                    <span className="text-slate-400 text-xs hidden sm:inline">{email}</span>
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
@@ -143,7 +186,6 @@ const UserDashboard = () => {
               key={item.id}
               className={`bg-[#06170d]/60 border border-emerald-950/80 backdrop-blur-3xl rounded-2xl p-5 transition-all duration-300 cursor-pointer group relative overflow-hidden flex flex-col justify-between hover:-translate-y-1 ${item.glow}`}
             >
-              {/* Radial subtle card background hover glow */}
               <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/[0.02] group-hover:bg-emerald-500/[0.05] rounded-full blur-xl transition-all duration-500" />
               
               <div>
