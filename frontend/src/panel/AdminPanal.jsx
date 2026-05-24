@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AdminPanel = () => {
   const menuItems = [
@@ -13,7 +14,7 @@ const AdminPanel = () => {
     { name: "Notifications", active: false },
     { name: "Settings", active: false },
   ];
-
+  const navigate = useNavigate();
   const [arr, setarr] = useState([]);
   const [isloading, setisloading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -42,13 +43,13 @@ const AdminPanel = () => {
   // --- DYNAMIC DATA CALCULATION FROM 'arr' ---
   const totalMembers = arr.length;
   
-  // Filtering active members (Agar status na ho toh default Active maan rahe hain)
+  // Filtering active members
   const activeMembers = arr.filter(m => m.status === "Active" || !m.status).length;
   
   // Filtering pending members
   const pendingMembers = arr.filter(m => m.status === "Pending").length;
 
-  // Stats array jo user data ke calculation par dynamic glow karega
+  // Stats array
   const dynamicStats = [
     { 
       title: "Total Members", 
@@ -68,14 +69,14 @@ const AdminPanel = () => {
     },
     { 
       title: "Today Attendance", 
-      value: isloading ? "..." : Math.round(activeMembers * 0.4), // Dynamic mock attendance 
+      value: isloading ? "..." : Math.round(activeMembers * 0.4), 
       change: "+4% vs yesterday", 
       glowClass: "group-hover:border-cyan-500/50",
       bgGlow: "bg-cyan-500/10",
       textColor: "text-cyan-400"
     },
     { 
-      title: "Pending Approvals", 
+      title: "your qr", 
       value: isloading ? "..." : pendingMembers, 
       change: `${pendingMembers} profiles review req.`, 
       glowClass: pendingMembers > 0 ? "border-amber-500/30 group-hover:border-amber-500/60" : "group-hover:border-slate-500/50",
@@ -166,6 +167,7 @@ const AdminPanel = () => {
             </div>
           </div>
 
+          {/* Action Row containing Search, Your QR, and Notification */}
           <div className="flex items-center gap-3 w-full md:w-auto justify-end">
             <div className="relative flex-1 md:flex-none">
               <input
@@ -174,6 +176,15 @@ const AdminPanel = () => {
                 className="w-full md:w-64 bg-[#071d10]/60 border border-emerald-900/40 text-slate-200 pl-4 pr-10 py-2.5 rounded-xl text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-emerald-800"
               />
             </div>
+            
+            {/* UPDATED & REPOSITIONED "YOUR QR" BUTTON */}
+            <button 
+              onClick={() => navigate('/adminpanel')}
+              className="flex items-center gap-2 bg-[#071d10]/80 border border-emerald-500/30 hover:border-emerald-400/70 text-emerald-400 hover:text-emerald-300 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 shadow-md shadow-emerald-950/40 hover:shadow-emerald-500/10 shrink-0"
+            >
+              <span>🔳</span> Your QR
+            </button>
+
             <button className="relative bg-[#071d10]/60 border border-emerald-900/40 p-2.5 rounded-xl text-emerald-400 shrink-0">
               <span className="absolute top-2 right-2 w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span>
               🔔
@@ -188,7 +199,6 @@ const AdminPanel = () => {
               key={index}
               className={`bg-[#06170d]/70 border border-emerald-950 rounded-2xl p-5 sm:p-6 relative overflow-hidden backdrop-blur-md transition-all duration-300 group ${item.glowClass}`}
             >
-              {/* Radial glow backing layer */}
               <div className={`absolute top-0 right-0 w-24 h-24 rounded-full blur-2xl group-hover:scale-125 transition-all duration-500 ${item.bgGlow}`}></div>
               
               <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest">{item.title}</p>

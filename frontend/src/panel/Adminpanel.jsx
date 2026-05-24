@@ -33,14 +33,7 @@ const AdminPanel = () => {
             </p>
           </div>
           
-          <Link to="/admin">
-            <button 
-              onClick={handleLogout}
-              className="bg-red-600/80 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-xl border border-red-500/30 transition-all duration-200 text-sm"
-            >
-              Logout 🔒
-            </button>
-          </Link>
+        
         </div>
 
         {/* Content Layout */}
@@ -94,10 +87,7 @@ const AdminPanel = () => {
         </div>
 
       </div>
-      <div className='w-full'>
-<Usercount/>
-
-      </div>
+  
     </div>
   );
 };
